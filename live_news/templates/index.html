@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News Query App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            text-align: center;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #e7f7e7;
+            border: 1px solid #d3e8d3;
+            border-radius: 5px;
+        }
+        .error {
+            color: red;
+            padding: 10px;
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>News Query App</h1>
+
+    <div class="container">
+        <input type="text" id="query" placeholder="Enter your query (e.g., 'tech news')">
+        <button onclick="submitQuery()">Get Answer</button>
+
+        <div id="response" class="result" style="display:none;"></div>
+        <div id="error" class="error" style="display:none;"></div>
+    </div>
+
+    <script>
+        function submitQuery() {
+            const query = document.getElementById("query").value;
+            const errorDiv = document.getElementById("error");
+            const responseDiv = document.getElementById("response");
+
+            // Clear previous error and result
+            errorDiv.style.display = "none";
+            responseDiv.style.display = "none";
+
+            if (!query) {
+                errorDiv.textContent = "Please enter a query.";
+                errorDiv.style.display = "block";
+                return;
+            }
+
+            // Prepare the data for the POST request
+            const data = {
+                query: query
+            };
+
+            fetch('/api/query/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    errorDiv.textContent = data.error;
+                    errorDiv.style.display = "block";
+                } else if (data.answer) {
+                    responseDiv.textContent = data.answer;
+                    responseDiv.style.display = "block";
+                }
+            })
+            .catch(error => {
+                errorDiv.textContent = "There was an error processing your request.";
+                errorDiv.style.display = "block";
+            });
+        }
+    </script>
+
+</body>
+</html>
